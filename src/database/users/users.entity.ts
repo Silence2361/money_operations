@@ -8,6 +8,12 @@ export class User {
   @Column()
   name: string;
 
+  @Column()
+  last_name: string;
+
+  @Column({ type: 'date' })
+  birth_date: string;
+
   @Column({ type: 'decimal', default: 0 })
   balance: string;
 }

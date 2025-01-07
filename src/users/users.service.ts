@@ -18,16 +18,6 @@ export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async createUser(createUser: ICreateUser): Promise<ICreateUserResponse> {
-    const existingUser = await this.usersRepository.getUserByName(
-      createUser.name,
-    );
-
-    if (existingUser) {
-      throw new ConflictException(
-        `User with name ${createUser.name} already exists`,
-      );
-    }
-
     const user: IUser = await this.usersRepository.createUser(createUser);
 
     return {

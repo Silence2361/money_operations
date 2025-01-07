@@ -23,10 +23,6 @@ export class UsersRepository {
     return this.userRepository.findOne({ where: { id: user_id } });
   }
 
-  async getUserByName(name: string): Promise<IUser | null> {
-    return this.userRepository.findOne({ where: { name } });
-  }
-
   async updateUserById(
     user_id: number,
     updateUser: IUpdateUser,
