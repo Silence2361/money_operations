@@ -1,16 +1,20 @@
 export interface IUser {
   id: number;
-  name: string;
+  first_name: string;
   last_name: string;
-  birth_date: string;
+  birth_date: Date;
   balance: string;
+  email: string;
+  password: string;
 }
 
 export interface ICreateUser {
-  name: string;
+  first_name: string;
   last_name: string;
-  birth_date: string;
+  birth_date: Date;
   balance: string;
+  email: string;
+  password: string;
 }
 
 export interface ICreateUserResponse {
@@ -19,23 +23,27 @@ export interface ICreateUserResponse {
 
 export interface IGetUsersResponse {
   id: number;
-  name: string;
+  first_name: string;
   last_name: string;
-  birth_date: string;
+  birth_date: Date;
   balance: string;
+  email: string;
 }
 
 export interface IGetUserByIdResponse {
   id: number;
-  name: string;
+  first_name: string;
   last_name: string;
-  birth_date: string;
+  birth_date: Date;
   balance: string;
+  email: string;
 }
 
 export interface IUpdateUser {
-  name?: string;
+  first_name?: string;
   balance?: string;
   last_name?: string;
-  birth_date?: string;
+  birth_date?: Date;
+  email?: string;
+  password?: string;
 }

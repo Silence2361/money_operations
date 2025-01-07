@@ -23,6 +23,10 @@ export class UsersRepository {
     return this.userRepository.findOne({ where: { id: user_id } });
   }
 
+  async getUserByEmail(email: string): Promise<IUser> {
+    return this.userRepository.findOne({ where: { email } });
+  }
+
   async updateUserById(
     user_id: number,
     updateUser: IUpdateUser,

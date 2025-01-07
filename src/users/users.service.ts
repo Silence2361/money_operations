@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   ICreateUser,
   ICreateUserResponse,
@@ -26,11 +22,29 @@ export class UsersService {
   }
 
   async getUsers(): Promise<IGetUsersResponse[]> {
-    return this.usersRepository.getUsers();
+    const users = await this.usersRepository.getUsers();
+
+    return users.map((user) => ({
+      id: user.id,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      birth_date: user.birth_date,
+      balance: user.balance,
+    }));
   }
 
   async getUserById(user_id: number): Promise<IGetUserByIdResponse> {
-    return this.findUserOrFail(user_id);
+    const user = await this.findUserOrFail(user_id);
+
+    return {
+      id: user.id,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      birth_date: user.birth_date,
+      balance: user.balance,
+    };
   }
 
   async updateUserById(

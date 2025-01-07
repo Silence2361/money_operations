@@ -5,7 +5,7 @@ export class GetUsersResponseDto {
   id: number;
 
   @ApiProperty()
-  name: string;
+  first_name: string;
 
   @ApiProperty()
   balance: string;

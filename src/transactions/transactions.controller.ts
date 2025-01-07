@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionResponseDto } from './dto/create-transaction-response.dto';
@@ -17,9 +18,11 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/jwt/jwt-auth.guard';
 
 @ApiTags('Transactions')
 @Controller('transactions')
+@UseGuards(JwtAuthGuard)
 export class TransactionsControllerP {
   constructor(private readonly transactionsService: TransactionsService) {}
 

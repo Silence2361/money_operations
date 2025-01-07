@@ -6,6 +6,7 @@ import {
   Delete,
   Param,
   Body,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserResponseDto } from './dto/create-user-response.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -22,9 +23,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { GetUserByIdResponseDto } from './dto/get-user-by-id-response.dto';
+import { JwtAuthGuard } from 'src/jwt/jwt-auth.guard';
 
 @ApiTags('Users')
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 

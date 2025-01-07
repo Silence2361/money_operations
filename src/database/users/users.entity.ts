@@ -6,14 +6,20 @@ export class User {
   id: number;
 
   @Column()
-  name: string;
+  first_name: string;
 
   @Column()
   last_name: string;
 
-  @Column({ type: 'date' })
-  birth_date: string;
+  @Column({ type: 'date', nullable: true })
+  birth_date: Date;
 
   @Column({ type: 'decimal', default: 0 })
   balance: string;
+
+  @Column({ unique: true })
+  email: string;
+
+  @Column()
+  password: string;
 }

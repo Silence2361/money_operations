@@ -6,6 +6,10 @@ import { User } from './database/users/users.entity';
 import { Transaction } from './database/transactions/transactions.entity';
 import { TransactionsModule } from './transactions/transactions.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthService } from './auth/auth.service';
+import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './auth/auth.module';
+import { JwtModule } from './jwt/jwt.module';
 
 @Module({
   imports: [
@@ -31,6 +35,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     UsersModule,
     RepositoryModule,
     TransactionsModule,
+    AuthModule,
+    JwtModule,
   ],
+  providers: [AuthService],
+  controllers: [AuthController],
 })
 export class AppModule {}

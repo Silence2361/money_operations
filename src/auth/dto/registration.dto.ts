@@ -1,15 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsDateString,
-  IsEmail,
   IsString,
-  Matches,
-  MaxLength,
+  IsEmail,
   MinLength,
+  MaxLength,
+  IsOptional,
+  IsDateString,
 } from 'class-validator';
 
-export class CreateUserDto {
+export class RegistrationDto {
   @ApiProperty({ example: 'user@example.com', description: 'Email' })
+  @IsEmail()
   @IsEmail()
   email: string;
 
@@ -42,12 +43,6 @@ export class CreateUserDto {
     {},
     { message: 'birth_date must be a valid date in YYYY-MM-DD format' },
   )
+  @IsOptional()
   birth_date: Date;
-
-  @ApiProperty({ example: '1000.00', description: 'The balance of the user' })
-  @IsString()
-  @Matches(/^\d+(\.\d{1,2})?$/, {
-    message: 'Balance must be a positive number with up to 2 decimal places',
-  })
-  balance: string;
 }
