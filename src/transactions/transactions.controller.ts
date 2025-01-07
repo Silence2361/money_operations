@@ -37,16 +37,6 @@ export class TransactionsControllerP {
     return this.transactionsService.createTransactions(createTransaction);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all transactions' })
-  @ApiOkResponse({
-    description: 'List of transactions',
-    type: [GetTransactionsResponseDto],
-  })
-  async getTransactions(): Promise<GetTransactionsResponseDto[]> {
-    return this.transactionsService.getTransactions();
-  }
-
   @Get(':transaction_id')
   @ApiOperation({ summary: 'Get transactions by ID ' })
   @ApiOkResponse({

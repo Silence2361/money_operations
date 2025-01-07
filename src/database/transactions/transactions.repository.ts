@@ -19,10 +19,6 @@ export class TransactionsRepository {
     return this.transactionsRepository.save(transaction);
   }
 
-  async getTransactions(): Promise<ITransaction[]> {
-    return this.transactionsRepository.find({ order: { created_at: 'DESC' } });
-  }
-
   async getTransactionById(
     transaction_id: number,
   ): Promise<ITransaction | null> {
@@ -34,7 +30,7 @@ export class TransactionsRepository {
   async getUserTransactions(user_id: number): Promise<ITransaction[]> {
     return this.transactionsRepository.find({
       where: { user_id },
-      order: { created_at: 'ASC' },
+      order: { created_at: 'DESC' },
     });
   }
 

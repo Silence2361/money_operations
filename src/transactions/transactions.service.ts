@@ -13,10 +13,14 @@ import {
 import { IUser } from '../database/users/users.interface';
 import { TransactionType } from '../database/transactions/enum/transaction.enum';
 import { UsersRepository } from '../database/users/users.repository';
+import { User } from '../database/users/users.entity';
+import { Transaction } from '../database/transactions/transactions.entity';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class TransactionsService {
   constructor(
+    private readonly dataSource: DataSource,
     private readonly transactionsRepository: TransactionsRepository,
     private readonly usersRepository: UsersRepository,
   ) {}
@@ -62,10 +66,6 @@ export class TransactionsService {
   }
 
   private validateAmount(amount: number): void {
-    if (amount <= 0) {
-      throw new BadRequestException('Amount must be greater than zero');
-    }
-
     const decimalPlaces = (amount.toString().split('.')[1] || '').length;
     if (decimalPlaces > 2) {
       throw new BadRequestException(
@@ -77,28 +77,57 @@ export class TransactionsService {
   private async handleDeposit(user: IUser, amount: number): Promise<void> {
     this.validateAmount(amount);
 
-    const currentBalance = parseFloat(user.balance);
-    const newBalance = currentBalance + amount;
+    const queryRunner = this.dataSource.createQueryRunner();
 
-    await this.usersRepository.updateUserById(user.id, {
-      balance: newBalance.toString(),
-    });
+    await queryRunner.connect();
+
+    await queryRunner.startTransaction();
+
+    try {
+      const currentBalance = parseFloat(user.balance);
+      const newBalance = currentBalance + amount;
+
+      await this.usersRepository.updateUserById(user.id, {
+        balance: newBalance.toString(),
+      });
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   private async handleWithdraw(user: IUser, amount: number): Promise<void> {
     this.validateAmount(amount);
 
-    const currentBalance = parseFloat(user.balance);
+    const queryRunner = this.dataSource.createQueryRunner();
 
-    if (currentBalance < amount) {
-      throw new BadRequestException('Insufficient funds');
+    await queryRunner.connect();
+
+    await queryRunner.startTransaction();
+
+    try {
+      const currentBalance = parseFloat(user.balance);
+
+      if (currentBalance < amount) {
+        throw new BadRequestException('Insufficient funds');
+      }
+      const newBalance = currentBalance - amount;
+
+      await this.usersRepository.updateUserById(user.id, {
+        balance: newBalance.toString(),
+      });
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-
-    const newBalance = currentBalance - amount;
-
-    await this.usersRepository.updateUserById(user.id, {
-      balance: newBalance.toString(),
-    });
   }
 
   private async handleTransfer(
@@ -126,31 +155,35 @@ export class TransactionsService {
 
     const updatedRecipientBalance = recipientBalance + amount;
 
-    await this.usersRepository.updateUserById(user.id, {
-      balance: updatedSenderBalance.toString(),
-    });
+    const queryRunner = this.dataSource.createQueryRunner();
 
-    await this.usersRepository.updateUserById(recipient.id, {
-      balance: updatedRecipientBalance.toString(),
-    });
+    await queryRunner.connect();
 
-    await this.transactionsRepository.createTransation({
-      user_id: user.id,
-      type: TransactionType.WITHDRAW,
-      amount,
-      recipient_id,
-    });
+    await queryRunner.startTransaction();
 
-    await this.transactionsRepository.createTransation({
-      user_id: recipient.id,
-      type: TransactionType.DEPOSIT,
-      amount,
-      recipient_id: user.id,
-    });
-  }
+    try {
+      await queryRunner.manager.update(User, user.id, {
+        balance: updatedSenderBalance.toString(),
+      });
 
-  async getTransactions(): Promise<IGetTransactionsResponse[]> {
-    return this.transactionsRepository.getTransactions();
+      await queryRunner.manager.update(User, recipient.id, {
+        balance: updatedRecipientBalance.toString(),
+      });
+
+      await queryRunner.manager.insert(Transaction, {
+        user_id: user.id,
+        type: TransactionType.TRANSFER,
+        amount,
+        recipient_id,
+      });
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async getTransactionById(
