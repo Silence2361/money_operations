@@ -4,16 +4,16 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UsersRepository } from 'src/database/users/users.repository';
+import { UsersRepository } from '../database/users/users.repository';
 import { JwtService } from '@nestjs/jwt';
 import {
   ILogin,
   ILoginResponse,
   IRegistration,
   IRegistrationResponse,
-} from 'src/database/auth/auth.interface';
+} from '../database/auth/auth.interface';
 import * as bcrypt from 'bcrypt';
-import { IUser } from 'src/database/users/users.interface';
+import { IUser } from '../database/users/users.interface';
 
 @Injectable()
 export class AuthService {
